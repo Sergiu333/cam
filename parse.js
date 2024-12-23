@@ -5,7 +5,7 @@ async function loginAndMonitor({ loginUrl, dataUrl, punctDeTrecere, loginData })
     const browser = await puppeteer.launch({
         headless: false,
         defaultViewport: null,
-        args: ['--window-size=1600,900'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     const page = await browser.newPage();
