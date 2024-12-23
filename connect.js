@@ -1,7 +1,7 @@
 const mysql = require('mysql2/promise');
 const dbConfig = require('./config/db.config');
 
-async function insertCamionData(numberPlate, dateTime, punct) {
+async function insertCamionData(numberPlate, dateTime, punct, idAgent) {
     const connection = await mysql.createConnection({
         host: dbConfig.host,
         user: dbConfig.user,
@@ -12,24 +12,25 @@ async function insertCamionData(numberPlate, dateTime, punct) {
 
     try {
         const Succes = 'pending';
-        const id_agent = 3;
+        const id_agent = idAgent;
         const id_punct_de_trecere = punct;
         const id_punct_de_devamare = null;
         const isDeleted = '0';
 
         const [existing] = await connection.execute(
-            `SELECT 1 FROM Camioane WHERE Numar_inmatriculare = ? LIMIT 1`,
-            [numberPlate]
+            `SELECT id_camion, Succes, Timp_intrare, Timp_iesire FROM Camioane WHERE Numar_inmatriculare = ? AND Succes = ? LIMIT 1`,
+            [numberPlate, Succes]
         );
 
         if (existing.length > 0) {
+            const idCamion = existing[0].id_camion;
             await connection.execute(
                 `UPDATE Camioane 
-                SET Succes = 'true', Timp_actualizare = ? 
-                WHERE Numar_inmatriculare = ?`,
-                [dateTime, numberPlate]
+                SET Succes = 'true', Timp_iesire = ? 
+                WHERE id_camion = ?`,
+                [dateTime, idCamion]
             );
-            console.log(`Numarul de inmatriculare ${numberPlate} exista deja, actualizat cu succesul true si Timp_actualizare. <-${punct}`);
+            console.log(`Numarul de inmatriculare ${numberPlate} exista deja, actualizat cu succesul true si Timp_iesire la ${dateTime}. <-${punct}`);
         } else {
             await connection.execute(
                 `INSERT INTO Camioane 
