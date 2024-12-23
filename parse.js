@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const insertCamionData = require('./connect');
 
-async function loginAndMonitor({ loginUrl, dataUrl, punctDeTrecere, loginData }) {
+async function loginAndMonitor({ loginUrl, dataUrl, punctDeTrecere, loginData, idAgent }) {
     const browser = await puppeteer.launch({
         headless: false,
         defaultViewport: null,
@@ -65,7 +65,7 @@ async function loginAndMonitor({ loginUrl, dataUrl, punctDeTrecere, loginData })
                 console.log(uniqueNewElements);
 
                 for (const element of uniqueNewElements) {
-                    await insertCamionData(element.numberPlate, element.dateTime, punctDeTrecere);
+                    await insertCamionData(element.numberPlate, element.dateTime, punctDeTrecere, idAgent);
                 }
             }
         }, 5000);
