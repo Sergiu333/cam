@@ -1,8 +1,8 @@
 module.exports = {
-    host: 'dotteam.mysql.tools',
-    user: 'dotteam_digi',
-    password: 'Y!uJ92r9&m',
-    database: 'dotteam_digi',
+    host: 'idocumen.mysql.tools',
+    user: 'idocumen_digi',
+    password: '^U3T;3si3u',
+    database: 'idocumen_digi',
     port: 3306,
     // Șterge secțiunea ssl sau comentează-o dacă nu o folosești
     // ssl: {
