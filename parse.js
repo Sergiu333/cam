@@ -4,33 +4,44 @@ const fetch = require("node-fetch");
 
 
 const sendEmail = async () => {
-    const data = {
-        Digipark_Sergiu: "Atentie !!!",
-        email: "anghelenicis59@gmail.com",
-        message: "Una dintre camere nu functioneaza.",
-    }
-    try {
-        const response = await fetch("https://api.web3forms.com/submit", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
-                access_key: `6254f697-eb32-47be-8510-84575802d27a`,
-                ...data,
-            })
-        });
+    const emailList = [
+        { email: "anghelenicis59@gmail.com", message: "Una dintre camere nu functioneaza." },
+        { email: "cridyson@gmail.com", message: "Una dintre camere nu functioneaza." },
+        { email: "suharenco.sergiu@gmail.com", message: "Una dintre camere nu functioneaza." },
+        { email: "dan@dotteam.co", message: "Una dintre camere nu functioneaza." }
+    ];
 
-        const result = await response.json();
-        console.log(result);
-        if (result.success) {
-            console.log("Mesaj trimis cu succes!");
-        } else {
-            console.error("Eroare la trimiterea mesajului:", result);
+    for (const recipient of emailList) {
+        const data = {
+            Digipark_Sergiu: "Atentie !!!",
+            email: recipient.email,
+            message: recipient.message,
+        };
+
+        try {
+            const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    access_key: `6254f697-eb32-47be-8510-84575802d27a`,
+                    ...data,
+                })
+            });
+
+            const result = await response.json();
+            console.log(`Rezultat pentru ${recipient.email}:`, result);
+
+            if (result.success) {
+                console.log(`Mesaj trimis cu succes către ${recipient.email}!`);
+            } else {
+                console.error(`Eroare la trimiterea mesajului către ${recipient.email}:`, result);
+            }
+        } catch (error) {
+            console.error(`A apărut o eroare la trimiterea datelor pentru ${recipient.email}:`, error);
         }
-    } catch (error) {
-        console.error('A apărut o eroare la trimiterea datelor:', error);
     }
 };
 
