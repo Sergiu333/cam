@@ -1,5 +1,53 @@
 const puppeteer = require('puppeteer');
 const insertCamionData = require('./connect');
+const fetch = require("node-fetch");
+
+
+const sendEmail = async () => {
+    const data = {
+        Digipark_Sergiu: "Atentie !!!",
+        email: "anghelenicis59@gmail.com",
+        message: "Una dintre camere nu functioneaza.",
+    }
+    try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify({
+                access_key: `6254f697-eb32-47be-8510-84575802d27a`,
+                ...data,
+            })
+        });
+
+        const result = await response.json();
+        console.log(result);
+        if (result.success) {
+            console.log("Mesaj trimis cu succes!");
+        } else {
+            console.error("Eroare la trimiterea mesajului:", result);
+        }
+    } catch (error) {
+        console.error('A apărut o eroare la trimiterea datelor:', error);
+    }
+};
+
+const checkLinkAvailability = async (url) => {
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            console.log(`Conectare reușită la: ${url}`);
+        } else {
+            console.error(`Eroare la conectarea la: ${url} (Status: ${response.status})`);
+            sendEmail();
+        }
+    } catch (error) {
+        console.error(`Nu s-a putut conecta la: ${url} - Eroare: ${error.message}`);
+        sendEmail();
+    }
+};
 
 async function loginAndMonitor({ loginUrl, dataUrl, punctDeTrecere, loginData, idAgent }) {
     const browser = await puppeteer.launch({
@@ -76,5 +124,14 @@ async function loginAndMonitor({ loginUrl, dataUrl, punctDeTrecere, loginData, i
         console.log('Se colecteaza datele de pe camera ... ');
     }
 }
+
+const monitorLinks = (loginUrl, dataUrl) => {
+    setInterval(async () => {
+        await checkLinkAvailability(loginUrl);
+        await checkLinkAvailability(dataUrl);
+    }, 600000);
+};
+
+monitorLinks()
 
 module.exports = loginAndMonitor;
