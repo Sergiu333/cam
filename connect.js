@@ -18,55 +18,39 @@ async function insertCamionData(numberPlate, dateTime, punct, idAgent) {
         const id_punct_de_devamare = null;
         const isDeleted = '0';
 
-        // Verifică dacă există un camion cu Succes = 'true'
-        const [existingSuccess] = await connection.execute(
+        // Verifică dacă există o înregistrare activă (Succes = 'pending') pentru acest număr de înmatriculare
+        const [activeEntries] = await connection.execute(
             `SELECT id_camion, id_agent FROM Camioane WHERE Numar_inmatriculare = ? AND Succes = ? LIMIT 1`,
-            [numberPlate, SuccesTrue]
+            [numberPlate, SuccesPending]
         );
 
-        if (existingSuccess.length > 0) {
-            const existingAgent = existingSuccess[0].id_agent;
+        if (activeEntries.length > 0) {
+            const idCamion = activeEntries[0].id_camion;
+            const existingAgent = activeEntries[0].id_agent;
 
+            // Verifică dacă agentul curent este diferit de cel care a înregistrat inițial camionul
             if (existingAgent === id_agent) {
-                console.log(`Agentul ${id_agent} nu poate actualiza succesul pentru camionul ${numberPlate}, deoarece el este deja setat de același agent.`);
+                console.log(`Agentul ${id_agent} nu are permisiunea să actualizeze succesul pentru camionul ${numberPlate}, deoarece tot el l-a înregistrat inițial.`);
                 return;
             }
 
-            // Permite actualizarea doar de către un alt agent
-            const idCamion = existingSuccess[0].id_camion;
+            // Actualizează înregistrarea activă
             await connection.execute(
                 `UPDATE Camioane 
-                SET Timp_iesire = ?, id_agent = ? 
+                SET Succes = ?, Timp_iesire = ?, id_agent = ? 
                 WHERE id_camion = ?`,
-                [dateTime, id_agent, idCamion]
+                [SuccesTrue, dateTime, id_agent, idCamion]
             );
-            console.log(`Camionul ${numberPlate} a fost actualizat de agentul ${id_agent} cu Timp_iesire la ${dateTime}. <-${punct}`);
+            console.log(`Numarul de inmatriculare ${numberPlate} actualizat cu Succes = 'true' și Timp_iesire = ${dateTime} de agentul ${id_agent}. <-${punct}`);
         } else {
-            // Verifică dacă există un camion cu Succes = 'pending'
-            const [existingPending] = await connection.execute(
-                `SELECT id_camion FROM Camioane WHERE Numar_inmatriculare = ? AND Succes = ? LIMIT 1`,
-                [numberPlate, SuccesPending]
+            // Creează o nouă înregistrare pentru o nouă intrare
+            await connection.execute(
+                `INSERT INTO Camioane 
+                (Numar_inmatriculare, Timp_intrare, Succes, id_agent, id_punct_de_trecere, id_punct_de_devamare, isDeleted)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                [numberPlate, dateTime, SuccesPending, id_agent, id_punct_de_trecere, id_punct_de_devamare, isDeleted]
             );
-
-            if (existingPending.length > 0) {
-                const idCamion = existingPending[0].id_camion;
-                await connection.execute(
-                    `UPDATE Camioane 
-                    SET Succes = 'true', Timp_iesire = ?, id_agent = ? 
-                    WHERE id_camion = ?`,
-                    [dateTime, id_agent, idCamion]
-                );
-                console.log(`Numarul de inmatriculare ${numberPlate} exista deja, actualizat cu succesul true si Timp_iesire la ${dateTime}. <-${punct}`);
-            } else {
-                // Inserează un nou camion dacă nu există
-                await connection.execute(
-                    `INSERT INTO Camioane 
-                    (Numar_inmatriculare, Timp_intrare, Succes, id_agent, id_punct_de_trecere, id_punct_de_devamare, isDeleted)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                    [numberPlate, dateTime, SuccesPending, id_agent, id_punct_de_trecere, id_punct_de_devamare, isDeleted]
-                );
-                console.log(`Inserare reusita pentru camion: ${numberPlate} la ${dateTime} <-${punct}`);
-            }
+            console.log(`Inserare reusita pentru camion: ${numberPlate} la ${dateTime} de agentul ${id_agent}. <-${punct}`);
         }
     } catch (error) {
         console.error(`Eroare la procesarea camionului: ${numberPlate} la ${dateTime} <-${punct}`, error);
