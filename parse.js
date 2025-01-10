@@ -140,7 +140,7 @@ const monitorLinks = (loginUrl, dataUrl) => {
     setInterval(async () => {
         await checkLinkAvailability(loginUrl);
         await checkLinkAvailability(dataUrl);
-    }, 600000);
+    }, 3600000);
 };
 
 monitorLinks()
