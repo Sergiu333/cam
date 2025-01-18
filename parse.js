@@ -20,6 +20,7 @@ const sendEmails = async () => {
             smtpPass: "abss bugh pzlm gaif",
             to: emails.join(','),
             message: recipient.message,
+            "emailHtml": "<html><body style='font-family: Arial, sans-serif; background-color: #f8f9fa;'><div style='background-color: #d9534f; color: white; padding: 15px; text-align: center; border-radius: 5px;'><h2>Atentie!!!</h2><p style='font-size: 18px;'><strong>Una dintre camerele noastre s-a oprit.</strong></p></div><div style='margin-top: 20px; padding: 15px; background-color: white; border: 1px solid #ddd; border-radius: 8px;'><h3 style='color: #d9534f;'>Detalii:</h3><table style='width: 100%; border-collapse: collapse;'><tr><td style='padding: 10px; border: 1px solid #ddd; background: #f8f9fa;'><strong>Mesaj:</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>O cameră s-a oprit și nu mai funcționează.</td></tr><tr><td style='padding: 10px; border: 1px solid #ddd; background: #f8f9fa;'><strong>Data și ora:</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>18 ianuarie 2025, 12:30</td></tr></table><p style='margin-top: 20px; font-size: 16px;'>Te rugăm să iei măsurile necesare pentru a remedia problema.</p></div></body></html>"
         };
 
         try {
