@@ -159,9 +159,9 @@ const monitorLinks = (loginUrl, dataUrl) => {
     }, 3600000); // 3600000 ms = 1h
 };
 
-setInterval(async () => {
+//setInterval(async () => {
     monitorLinks()
-}, 60000); // 60000 ms = 1 minut
+//}, 60000); // 60000 ms = 1 minut
 
 
 module.exports = loginAndMonitor;
