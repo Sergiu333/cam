@@ -1,42 +1,49 @@
 const puppeteer = require('puppeteer');
 const insertCamionData = require('./connect');
 const fetch = require("node-fetch");
-const nodemailer = require('nodemailer');
-
-// Configurarea transportorului SMTP
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'anghelenicis59@gmail.com',
-        pass: 'abss bugh pzlm gaif'
-    }
-});
 
 const emailList = [
-    { email: "dumitruanghelenici@gmail.com", message: "Una dintre camere nu functioneaza." },
+    { email: "anghelenicis59@gmail.com", message: "Una dintre camere nu functioneaza." },
+    { email: "dan@dotteam.co", message: "Una dintre camere nu functioneaza." },
     { email: "cridyson@gmail.com", message: "Una dintre camere nu functioneaza." },
     { email: "suharenco.sergiu@gmail.com", message: "Una dintre camere nu functioneaza." },
-    { email: "dan@dotteam.co", message: "Una dintre camere nu functioneaza." },
-    { email: "anghelenicis59@gmail.com", message: "Una dintre camere nu functioneaza." }
 ];
 
 const sendEmails = async () => {
     for (const recipient of emailList) {
-        const mailOptions = {
-            from: 'anghelenicis59@gmail.com',
-            to: recipient.email,
+        const emails = Array.isArray(recipient.email) ? recipient.email : [recipient.email];
+
+        const emailData = {
             subject: 'Atentie !!!',
-            text: recipient.message,
+            from: 'anghelenicis59@gmail.com',
+            smtpUser: "anghelenicis59@gmail.com",
+            smtpPass: "abss bugh pzlm gaif",
+            to: emails.join(','),
+            message: recipient.message,
         };
 
         try {
-            await transporter.sendMail(mailOptions);
-            console.log(`Mesaj trimis cu succes către ${recipient.email}`);
+            const response = await fetch('https://send-mail-wine.vercel.app/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(emailData),
+            });
+
+            if (response.ok) {
+                console.log(`Mesaj trimis cu succes către ${emails.join(', ')}`);
+            } else {
+                const errorData = await response.json();
+                console.error(`Eroare la trimiterea mesajului către ${emails.join(', ')}:`, errorData);
+            }
         } catch (error) {
-            console.error(`Eroare la trimiterea mesajului către ${recipient.email}:`, error);
+            console.error(`Eroare la trimiterea mesajului către ${emails.join(', ')}:`, error);
         }
     }
 };
+
+
 
 sendEmails();
 
