@@ -4,9 +4,9 @@ const fetch = require("node-fetch");
 
 const emailList = [
     { email: "anghelenicis59@gmail.com", message: "Una dintre camere nu functioneaza." },
-    { email: "dan@dotteam.co", message: "Una dintre camere nu functioneaza." },
-    { email: "cridyson@gmail.com", message: "Una dintre camere nu functioneaza." },
-    { email: "suharenco.sergiu@gmail.com", message: "Una dintre camere nu functioneaza." },
+    // { email: "dan@dotteam.co", message: "Una dintre camere nu functioneaza." },
+    // { email: "cridyson@gmail.com", message: "Una dintre camere nu functioneaza." },
+    // { email: "suharenco.sergiu@gmail.com", message: "Una dintre camere nu functioneaza." },
 ];
 
 
@@ -55,11 +55,7 @@ const sendEmails = async () => {
     }
 };
 
-
-
 // sendEmails();
-
-
 
 const checkLinkAvailability = async (url) => {
     try {
@@ -77,6 +73,12 @@ const checkLinkAvailability = async (url) => {
 };
 
 async function loginAndMonitor({ loginUrl, dataUrl, punctDeTrecere, loginData, idAgent }) {
+    setInterval(async () => {
+        checkLinkAvailability(loginUrl);
+        checkLinkAvailability(dataUrl);
+    }, 3600000); // 3600000 ms = 1 h
+
+
     const browser = await puppeteer.launch({
         headless: false,
         defaultViewport: null,
@@ -151,17 +153,5 @@ async function loginAndMonitor({ loginUrl, dataUrl, punctDeTrecere, loginData, i
         console.log('Se colecteaza datele de pe camera ... ');
     }
 }
-
-const monitorLinks = (loginUrl, dataUrl) => {
-    setInterval(async () => {
-        await checkLinkAvailability(loginUrl);
-        await checkLinkAvailability(dataUrl);
-    }, 3600000); // 3600000 ms = 1h
-};
-
-setInterval(async () => {
-    monitorLinks()
-}, 60000); // 60000 ms = 1 minut
-
 
 module.exports = loginAndMonitor;
